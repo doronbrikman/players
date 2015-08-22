@@ -8,3 +8,4 @@ deploy
 *.swo
 *.log
 *.DS_Store
+.git

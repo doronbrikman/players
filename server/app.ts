@@ -13,5 +13,3 @@ var top = new stats.TopEleven();
 var topPlayers = top.getTopEleven(players);
 
 console.log(topPlayers);
-
-

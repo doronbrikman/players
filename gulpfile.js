@@ -10,8 +10,15 @@ gulp.task('typescript', function() {
         })).js.pipe(gulp.dest('./deploy/server'))
 });
 
+gulp.task('start', ['typescript'], function() {
+    nodemon({
+        script: 'deploy/server/app.js',
+        ext: 'js'
+    });
+});
+
 gulp.task('watch', function() {
-    gulp.watch('./server/**/*.ts', ['typescript']);
+    gulp.watch('./server/**/*.ts', ['start']);
 });
 
 gulp.task('serve', ['typescript'], function() {
