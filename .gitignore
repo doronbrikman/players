@@ -1,0 +1,10 @@
+node_modules
+server/node_modules
+typings
+deploy
+.idea
+.temp
+*.swp
+*.swo
+*.log
+*.DS_Store
