@@ -14,44 +14,83 @@ export module StatsModule {
 		}
 
 		public getTopEleven(players: Array<GameModule.Player>): Object {
-			for (let id in players) {
-				let player = players[id];
+			var formations = [[3, 4, 3], [3, 5, 2], [4, 3, 3], [4, 4, 2], [4, 5, 1], [5, 3, 2], [5, 4, 1]];
+			var topScore = 0;
+			var returnObj = {};
 
-				if (player.playerRole === 1) {
-					this.topGoalKeeper(player);
+			for (let formation of formations) {
+				this.defenders = [];
+				this.midfielders = [];
+				this.strikers = [];
+
+				for (let id in players) {
+					let player = players[id];
+
+					if (player.playerRole === 1) {
+						this.topGoalKeeper(player);
+					}
+
+					if (player.playerRole === 2) {
+						this.topDefenders(player, formation[0]);
+					}
+
+					if (player.playerRole === 3) {
+						this.topMidfielders(player, formation[1]);
+					}
+
+					if (player.playerRole === 4) {
+						this.topStrikers(player, formation[2]);
+					}
 				}
 
-				if (player.playerRole === 2) {
-					this.topDefenders(player);
-				}
-
-				if (player.playerRole === 3) {
-					this.topMidfielders(player);
-				}
-
-				if (player.playerRole === 4) {
-					this.topStrikers(player);
+				var score = this.calculateScore();
+				if (topScore < score) {
+					topScore = score;
+					returnObj = this.returnObj();
 				}
 			}
 
-			return this.returnObj();
+			return returnObj;
+		}
+
+		public calculateScore(): number {
+			var totalScore = 0;
+
+			totalScore += this.goalKeeper.playerScore;
+
+			this.defenders.forEach((player) => {
+				totalScore += player.playerScore;
+			});
+
+			this.midfielders.forEach((player) => {
+				totalScore += player.playerScore;
+			});
+
+			this.strikers.forEach((player) => {
+				totalScore += player.playerScore;
+			});
+
+			return totalScore;
 		}
 
 		public returnObj(): Object {
 			let list = {
-				'Goal Keeper': '', 'Defenders': [], 'Midfielders': [], 'Strikers': []
+				'שוער': '', 'הגנה': [], 'קישור': [], 'התקפה': []
 			};
 
-			list['Goal Keeper'] = this.goalKeeper.playerName;
+			list['שוער'] = this.goalKeeper.playerName;
 
-			for (let i = 0; i < 5; ++i) {
-				list['Defenders'].push(this.defenders[i].playerName);
-				list['Midfielders'].push(this.midfielders[i].playerName);
-			}
+			this.defenders.forEach((player) => {
+				list['הגנה'].push(player.playerName);
+			});
 
-			for (let i = 0; i < 3; ++i) {
-				list['Strikers'].push(this.strikers[i].playerName);
-			}
+			this.midfielders.forEach((player) => {
+				list['קישור'].push(player.playerName);
+			});
+
+			this.strikers.forEach((player) => {
+				list['התקפה'].push(player.playerName);
+			});
 
 			return list;
 		}
@@ -68,42 +107,48 @@ export module StatsModule {
 			}
 		}
 
-		public topDefenders(defender: GameModule.Player): void {
-			if (this.defenders.length < 5) {
+		public topDefenders(defender: GameModule.Player, amount: number): void {
+			if (this.defenders.length < amount) {
 				this.defenders.push(defender);
 				this.defenders = this.orderPlayers(this.defenders);
 				return;
 			}
 
-			if (this.defenders[4].playerScore < defender.playerScore) {
-				this.defenders[4] = defender;
+			if (this.defenders[this.defenders.length - 1].playerScore < defender.playerScore) {
+				this.defenders[this.defenders.length - 1] = defender;
 				this.orderPlayers(this.defenders);
 			}
 		}
 
-		public topMidfielders(midfielder: GameModule.Player): void {
-			if (this.midfielders.length < 5) {
+		public topMidfielders(midfielder: GameModule.Player, amount: number): void {
+			if (this.midfielders.length < amount) {
 				this.midfielders.push(midfielder);
 				this.midfielders = this.orderPlayers(this.midfielders);
 				return;
 			}
 
-			if (this.midfielders[4].playerScore < midfielder.playerScore) {
-				this.midfielders[4] = midfielder;
+			if (this.midfielders[this.midfielders.length - 1].playerScore < midfielder.playerScore) {
+				this.midfielders[this.midfielders.length - 1] = midfielder;
 				this.orderPlayers(this.midfielders);
 			}
 		}
 
-		public topStrikers(striker: GameModule.Player): void {
-			if (this.strikers.length < 3) {
+		public topStrikers(striker: GameModule.Player, amount: number): void {
+			if (this.strikers.length < amount) {
 				this.strikers.push(striker);
 				this.strikers = this.orderPlayers(this.strikers);
 				return;
 			}
 
-			if (this.strikers[2].playerScore < striker.playerScore) {
-				this.strikers[2] = striker;
+			if (this.strikers[this.strikers.length - 1].playerScore < striker.playerScore) {
+				this.strikers[this.strikers.length - 1] = striker;
 				this.orderPlayers(this.strikers);
+			}
+		}
+
+		public weakPlayer(player: GameModule.Player): void {
+			if (this.defenders[this.defenders.length - 1].playerScore < player.playerScore) {
+
 			}
 		}
 
